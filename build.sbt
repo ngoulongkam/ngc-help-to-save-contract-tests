@@ -8,6 +8,8 @@ testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/te
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports")
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 
+resolvers += Resolver.bintrayRepo("hmrc", "releases")
+
 val playVersion = "2.5.18"
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.4" % "test",
