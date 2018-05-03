@@ -23,7 +23,7 @@ import scala.util.{Failure, Success, Try}
 
 // This file contains a subset of auth-login-api's domain model classes
 
-private[authloginapi] case class LegacyGovernmentGatewayRequest(
+private[authloginapi] case class GovernmentGatewayLogin(
   credId: CredId,
   affinityGroup: AffinityGroup,
   confidenceLevel: ConfidenceLevel,

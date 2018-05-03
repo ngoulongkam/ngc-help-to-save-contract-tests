@@ -31,12 +31,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthLoginApiConnector(servicesConfig: ServicesConfig, wsClient: WSClient) {
 
   private val baseUrl = new URL(servicesConfig.baseUrl("auth-login-api"))
-  private val legacyGovernmentGatewayLoginUrl = new URL(baseUrl, "/government-gateway/legacy/login")
+  private val governmentGatewayLoginUrl = new URL(baseUrl, "/government-gateway/session/login")
 
-  private implicit val writes: Writes[LegacyGovernmentGatewayRequest] = Json.writes[LegacyGovernmentGatewayRequest]
+  private implicit val writes: Writes[GovernmentGatewayLogin] = Json.writes[GovernmentGatewayLogin]
 
   def governmentGatewayLogin(nino: Option[Nino] = None)(implicit ec: ExecutionContext): Future[HeaderCarrier] = {
-    val postBodyJson = Json.toJson(LegacyGovernmentGatewayRequest(
+    val postBodyJson = Json.toJson(GovernmentGatewayLogin(
       CredId(UUID.randomUUID().toString),
       AffinityGroup.Individual,
       ConfidenceLevel.L200,
@@ -46,7 +46,7 @@ class AuthLoginApiConnector(servicesConfig: ServicesConfig, wsClient: WSClient) 
       nino
     ))
 
-    wsClient.url(legacyGovernmentGatewayLoginUrl.toString).post(
+    wsClient.url(governmentGatewayLoginUrl.toString).post(
       postBodyJson
     ).map { response =>
       if (response.status != 201) {
