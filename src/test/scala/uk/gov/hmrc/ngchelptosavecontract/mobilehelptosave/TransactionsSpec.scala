@@ -18,17 +18,16 @@ package uk.gov.hmrc.ngchelptosavecontract.mobilehelptosave
 
 import java.time.LocalDate
 
-import org.scalatest.compatible.Assertion
 import org.scalatest.{AsyncWordSpec, Matchers}
 import play.api.Play
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, NotFoundException}
-import uk.gov.hmrc.ngchelptosavecontract.http.HttpRequests
 import uk.gov.hmrc.ngchelptosavecontract.scalatest.WSClientSpec
+import uk.gov.hmrc.ngchelptosavecontract.support.authloginapi.LoginSupport
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Tests that check that the /help-to-save/:nino/account/transactions in help-to-save
@@ -37,24 +36,23 @@ import scala.concurrent.{ExecutionContext, Future}
   * The test date used in this test can be viewed here:
   * confluence /pages/viewpage.action?pageId=113218311
   */
-class TransactionsSpec extends AsyncWordSpec with Matchers with FutureAwaits with DefaultAwaitTimeout with WSClientSpec {
+class TransactionsSpec extends AsyncWordSpec
+  with Matchers
+  with FutureAwaits
+  with DefaultAwaitTimeout
+  with WSClientSpec
+  with LoginSupport {
 
   val beth = Nino("EM000001A")
   val accountMissingNino = Nino("EM111111A")
 
-  val requests = HttpRequests(wsClient)
-
-  private def withLoggedInUser(nino: Nino)(assertionsF: HeaderCarrier => Future[Assertion])(implicit ec: ExecutionContext): Future[Assertion] = {
-    requests.governmentGatewayLoginFor(nino).flatMap(assertionsF)
-  }
-
-  "Transactions API /help-to-save/{nino}/account/transactions" should {
+  "/help-to-save/{nino}/account/transactions" should {
 
     s"return 400 when there is no system id provided" in {
 
       withLoggedInUser(beth) { implicit headerCarrier =>
 
-        val badRequestException = intercept[BadRequestException](await(requests.getTransactionsFor(beth, systemId = None)))
+        val badRequestException = intercept[BadRequestException](await(httpRequests.getTransactionsFor(beth, systemId = None)))
         badRequestException.responseCode shouldBe 400
       }
     }
@@ -62,7 +60,7 @@ class TransactionsSpec extends AsyncWordSpec with Matchers with FutureAwaits wit
     s"return 404 when there is no associated Help to Save account" in {
 
       withLoggedInUser(accountMissingNino) { implicit hc =>
-        
+
         val notFoundException = intercept[NotFoundException](getTransactionsFor(accountMissingNino))
         notFoundException.responseCode shouldBe 404
       }
@@ -121,7 +119,7 @@ class TransactionsSpec extends AsyncWordSpec with Matchers with FutureAwaits wit
 
 
   private def getTransactionsFor(nino: Nino)(implicit hc: HeaderCarrier, ec: ExecutionContext): Seq[Transaction] = {
-    await(requests.getTransactionsFor(nino)).as[Transactions].transactions
+    await(httpRequests.getTransactionsFor(nino)).as[Transactions].transactions
   }
 
   private def dateOf(year: Int, month: Int, day: Int) = {
