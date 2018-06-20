@@ -22,12 +22,15 @@ import org.scalatest.{BeforeAndAfterAll, Suite}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import uk.gov.hmrc.ngchelptosavecontract.http.HttpRequests
 
 trait WSClientSpec extends BeforeAndAfterAll with FutureAwaits { this: Suite with DefaultAwaitTimeout =>
   private implicit val system: ActorSystem = ActorSystem()
   private implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   protected val wsClient: WSClient = AhcWSClient()
+
+  val httpRequests = HttpRequests(wsClient)
 
   override protected def afterAll(): Unit = {
     wsClient.close()
