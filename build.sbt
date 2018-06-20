@@ -13,6 +13,8 @@ resolvers += Resolver.bintrayRepo("hmrc", "releases")
 val playVersion = "2.5.18"
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+  "io.lemonlabs" %% "scala-uri" % "1.1.1" % "test",
+  "org.typelevel" %% "cats-core" % "1.0.1",
   "org.pegdown" % "pegdown" % "1.6.0" % "test",
   "com.typesafe.play" %% "play-test" % playVersion % "test",
   "com.typesafe.play" %% "play-ws" % playVersion % "test",
