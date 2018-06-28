@@ -8,6 +8,7 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.ngchelptosavecontract.http.UriPathEncoding.encodePathSegment
+import uk.gov.hmrc.ngchelptosavecontract.support.ScalaUriConfig.uriConfig
 import uk.gov.hmrc.ngchelptosavecontract.support.authloginapi.AuthLoginApiConnector
 import uk.gov.hmrc.ngchelptosavecontract.support.{ServicesConfig, TestWSHttp}
 
@@ -57,17 +58,23 @@ case class HttpRequests(wsClient: WSClient, config: ServicesConfig = new Service
     auth.governmentGatewayLogin(Some(nino))
   }
 
-  private def transactionsUrlForNino(nino:String, systemId:Option[String]) : URL = {
-    val urlPart = s"/help-to-save/${encodePathSegment(nino)}/account/transactions"
-    systemId match {
-      case Some(sid) => new URL(helpToSaveBaseUrl, urlPart ? ("systemId" -> systemId))
-      case _ => new URL(helpToSaveBaseUrl, urlPart)
-    }
-  }
-
   private val SystemId = "MDTP-MOBILE"
 
-  def getTransactionsFor(nino:Nino, systemId:Option[String] = Some(SystemId))(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = {
+  private def accountUrlForNino(nino:String, systemId: Option[String]): URL = {
+    val urlPart = s"/help-to-save/${encodePathSegment(nino)}/account"
+    new URL(helpToSaveBaseUrl, urlPart ? ("systemId" -> systemId))
+  }
+
+  def getAccountFor(nino: Nino, systemId: Option[String] = Some(SystemId))(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = {
+    http.GET[JsValue](accountUrlForNino(nino.value, systemId).toString)
+  }
+
+  private def transactionsUrlForNino(nino: String, systemId: Option[String]): URL = {
+    val urlPart = s"/help-to-save/${encodePathSegment(nino)}/account/transactions"
+    new URL(helpToSaveBaseUrl, urlPart ? ("systemId" -> systemId))
+  }
+
+  def getTransactionsFor(nino: Nino, systemId: Option[String] = Some(SystemId))(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = {
     http.GET[JsValue](transactionsUrlForNino(nino.value, systemId).toString)
   }
 }
