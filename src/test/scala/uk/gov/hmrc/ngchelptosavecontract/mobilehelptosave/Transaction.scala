@@ -1,7 +1,7 @@
 package uk.gov.hmrc.ngchelptosavecontract.mobilehelptosave
 
-import java.time.LocalDate
 import cats.Eq
+import org.joda.time.LocalDate
 import play.api.libs.json._
 
 sealed trait Operation {
