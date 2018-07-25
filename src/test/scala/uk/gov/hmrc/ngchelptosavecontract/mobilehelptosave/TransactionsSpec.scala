@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.ngchelptosavecontract.mobilehelptosave
 
-import java.time.LocalDate
-
+import org.joda.time.LocalDate
 import org.scalatest.{AsyncWordSpec, Matchers}
 import play.api.Play
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
@@ -44,6 +43,7 @@ class TransactionsSpec extends AsyncWordSpec
   with LoginSupport {
 
   val beth = Nino("EM000001A")
+  val userWith48MonthsWorthOfTransactions = Nino("EM000006A") // has 49 months worth of transactions (useful for checking sequencing
   val accountMissingNino = Nino("EM111111A")
 
   "/help-to-save/{nino}/account/transactions" should {
@@ -114,16 +114,31 @@ class TransactionsSpec extends AsyncWordSpec
       }
     }
 
+    s"return all transactions in order for a 48 month period" in {
 
+      def monthlySequence(from: LocalDate): Stream[LocalDate] = from #:: monthlySequence(from.plusMonths(1))
+
+      withLoggedInUser(userWith48MonthsWorthOfTransactions) { implicit hc =>
+
+        val firstTransactionDate = dateOf(2014, 3, 1)
+
+        getTransactionsFor(userWith48MonthsWorthOfTransactions)
+          .zip(monthlySequence(from = firstTransactionDate))
+          .exists(transactionDateOutOfSequence) shouldBe false
+      }
+    }
   }
 
+  private val transactionDateOutOfSequence = (tuple: (Transaction, LocalDate)) => {
+    tuple._1.transactionDate !== tuple._2
+  }
 
   private def getTransactionsFor(nino: Nino)(implicit hc: HeaderCarrier, ec: ExecutionContext): Seq[Transaction] = {
     await(httpRequests.getTransactionsFor(nino)).as[Transactions].transactions
   }
 
   private def dateOf(year: Int, month: Int, day: Int) = {
-    LocalDate.of(year, month, day)
+    new LocalDate(year, month, day)
   }
 
   Play
