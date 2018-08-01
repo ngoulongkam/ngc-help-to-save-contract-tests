@@ -44,6 +44,7 @@ class AccountSpec extends AsyncWordSpec
   val beth = Nino("EM000001A")
   val accountClosedNino = Nino("EM000010A")
   val accountMissingNino = Nino("EM111111A")
+  val accountBlockedNino = Nino("EM000011A")
 
   "/help-to-save/{nino}/account" should {
 
@@ -87,8 +88,16 @@ class AccountSpec extends AsyncWordSpec
         account.closingBalance should not be None
       }
     }
-  }
 
+    s"return blocked account ($accountBlockedNino)" in {
+
+      withLoggedInUser(accountBlockedNino) { implicit hc =>
+
+        val account = getAccountFor(accountBlockedNino)
+        account.blocked.unspecified shouldBe true
+      }
+    }
+  }
 
   private def getAccountFor(nino: Nino)(implicit hc: HeaderCarrier, ec: ExecutionContext): Account = {
     await(httpRequests.getAccountFor(nino)).as[Account]
