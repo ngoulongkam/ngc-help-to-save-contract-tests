@@ -14,54 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.ngchelptosavecontract.mobilehelptosave
+package uk.gov.hmrc.ngchelptosavecontract.mobilehelptosave.json
 
-import org.joda.time.{LocalDate, YearMonth}
+import org.joda.time.YearMonth
 import play.api.libs.json._
 
-import scala.collection.Seq
-
-case class BonusTerm(
-  bonusEstimate: BigDecimal,
-  bonusPaid: BigDecimal,
-  endDate: LocalDate,
-  bonusPaidOnOrAfterDate: LocalDate
-)
-
-object BonusTerm {
-  implicit val format: OFormat[BonusTerm] = Json.format[BonusTerm]
-}
-
-case class Blocking(
-  unspecified: Boolean
-)
-
-object Blocking {
-  implicit val format: OFormat[Blocking] = Json.format[Blocking]
-}
-
-case class Account(
-  openedYearMonth: YearMonth,
-
-  isClosed: Boolean,
-
-  blocked: Blocking,
-
-  balance: BigDecimal,
-
-  paidInThisMonth: BigDecimal,
-  canPayInThisMonth: BigDecimal,
-  maximumPaidInThisMonth: BigDecimal,
-  thisMonthEndDate: LocalDate,
-
-  bonusTerms: Seq[BonusTerm],
-
-  closureDate: Option[LocalDate] = None,
-  closingBalance: Option[BigDecimal] = None
-)
-
-object Account {
-
+object Formats {
   implicit object JodaYearMonthFormat extends Format[YearMonth] {
     def writes(yearMonth: YearMonth): JsValue = JsString(yearMonth.toString)
 
@@ -76,6 +34,4 @@ object Account {
       case _ => JsError("error.expected.yearmonth")
     }
   }
-
-  implicit val format: OFormat[Account] = Json.format[Account]
 }

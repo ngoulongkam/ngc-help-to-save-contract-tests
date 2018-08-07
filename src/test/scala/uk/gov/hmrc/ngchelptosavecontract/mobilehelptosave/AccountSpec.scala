@@ -69,8 +69,12 @@ class AccountSpec extends AsyncWordSpec
         val account = getAccountFor(beth)
         // we don't exhaustively check values for simplicity because help-to-save-stub returns dates relative to the current date
         // checking that the value can be parsed into the case class used by mobile-help-to-save should give sufficient reassurance
+        account.accountNumber should not be empty
         account.isClosed shouldBe false
         account.balance shouldBe BigDecimal(250)
+        account.accountHolderForename shouldBe "Beth"
+        account.accountHolderSurname shouldBe "Planner"
+        account.accountHolderEmail shouldBe Some("email.address@domain.com")
       }
     }
 
@@ -95,8 +99,8 @@ class AccountSpec extends AsyncWordSpec
     }
   }
 
-  private def getAccountFor(nino: Nino)(implicit hc: HeaderCarrier, ec: ExecutionContext): Account = {
-    await(httpRequests.getAccountFor(nino)).as[Account]
+  private def getAccountFor(nino: Nino)(implicit hc: HeaderCarrier, ec: ExecutionContext): HelpToSaveAccount = {
+    await(httpRequests.getAccountFor(nino)).as[HelpToSaveAccount]
   }
 
   // Workaround to prevent ClassCastException being thrown when setting up Play.xercesSaxParserFactory when "test" is run twice in the same sbt session.
