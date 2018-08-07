@@ -38,7 +38,7 @@ class EnrolmentStatusSpec
     with LoginSupport {
 
 
-  private val generator = new Generator()
+  private val generator = new Generator(0)
 
   "/help-to-save/enrolment-status" should {
 
