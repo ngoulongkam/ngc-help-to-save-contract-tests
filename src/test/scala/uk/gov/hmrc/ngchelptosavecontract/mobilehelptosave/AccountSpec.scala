@@ -39,12 +39,8 @@ class AccountSpec extends AsyncWordSpec
   with FutureAwaits
   with DefaultAwaitTimeout
   with WSClientSpec
-  with LoginSupport {
-
-  val beth = Nino("EM000001A")
-  val accountClosedNino = Nino("EM000010A")
-  val accountMissingNino = Nino("EM111111A")
-  val accountBlockedNino = Nino("EM000011A")
+  with LoginSupport
+  with HelpToSaveStubNinos {
 
   "/help-to-save/{nino}/account" should {
 

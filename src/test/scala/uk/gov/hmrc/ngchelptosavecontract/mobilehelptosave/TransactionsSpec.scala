@@ -40,11 +40,8 @@ class TransactionsSpec extends AsyncWordSpec
   with FutureAwaits
   with DefaultAwaitTimeout
   with WSClientSpec
-  with LoginSupport {
-
-  val beth = Nino("EM000001A")
-  val userWith48MonthsWorthOfTransactions = Nino("EM000006A") // has 49 months worth of transactions (useful for checking sequencing
-  val accountMissingNino = Nino("EM111111A")
+  with LoginSupport
+  with HelpToSaveStubNinos {
 
   "/help-to-save/{nino}/account/transactions" should {
 
@@ -118,11 +115,11 @@ class TransactionsSpec extends AsyncWordSpec
 
       def monthlySequence(from: LocalDate): Stream[LocalDate] = from #:: monthlySequence(from.plusMonths(1))
 
-      withLoggedInUser(userWith48MonthsWorthOfTransactions) { implicit hc =>
+      withLoggedInUser(ninoWith48MonthsWorthOfTransactions) { implicit hc =>
 
         val firstTransactionDate = dateOf(2014, 3, 1)
 
-        getTransactionsFor(userWith48MonthsWorthOfTransactions)
+        getTransactionsFor(ninoWith48MonthsWorthOfTransactions)
           .zip(monthlySequence(from = firstTransactionDate))
           .exists(transactionDateOutOfSequence) shouldBe false
       }
