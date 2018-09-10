@@ -33,9 +33,7 @@ case class HttpRequests(wsClient: WSClient, config: ServicesConfig = new Service
     val createAccountRequest = Json.parse(
       s"""
          |{
-         |  "payload": {
-         |    "systemId" : "MDTP-MOBILE",
-         |    "version": "V2.0",
+         |  "userInfo": {
          |    "forename": "TestForename",
          |    "surname": "TestSurname",
          |    "dateOfBirth": "19500101",
