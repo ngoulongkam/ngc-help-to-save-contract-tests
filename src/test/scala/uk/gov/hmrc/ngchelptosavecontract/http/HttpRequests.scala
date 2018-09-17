@@ -33,7 +33,7 @@ case class HttpRequests(wsClient: WSClient, config: ServicesConfig = new Service
     val createAccountRequest = Json.parse(
       s"""
          |{
-         |  "userInfo": {
+         |  "payload": {
          |    "forename": "TestForename",
          |    "surname": "TestSurname",
          |    "dateOfBirth": "19500101",
